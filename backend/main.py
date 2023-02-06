@@ -48,8 +48,6 @@ def close_connection(conn):
 app = FastAPI()
 
 # Read a specific track
-
-
 @app.get("/tracks/{track_id}")
 def read_track(track_id: int):
     query = f"SELECT * FROM tracks WHERE ID={track_id}"
@@ -66,14 +64,17 @@ def read_track(track_id: int):
 # Create a new track
 @app.post("/tracks")
 def create_track(track: Track):
-    # Check if track already exists
-    exists_query = f"SELECT * FROM tracks WHERE ID={track.id}"
-    if execute_read_query(exists_query):
-        raise HTTPException(status_code=409, detail="Track already exists")
     # Insert the new track into the tracks table
     insert_query = f"INSERT INTO tracks (TrackName, Artist, Album, Genre, Duration) VALUES ('{track.name}', '{track.artist}', '{track.album}', '{track.genre}', {track.duration})"
     execute_query(insert_query)
+    # Fetch the ID of the inserted track
+    select_query = f"SELECT ID FROM tracks WHERE TrackName='{track.name}' AND Artist='{track.artist}' AND Album='{track.album}' AND Genre='{track.genre}' AND Duration={track.duration}"
+    result = execute_read_query(select_query)
+    track_id = result[0][0]
+    # Update the Track instance with the ID
+    track.id = track_id
     return track
+
 
 # Delete a specific track
 @app.delete("/tracks/{track_id}")
@@ -95,18 +96,25 @@ def delete_track(track_id: int):
 def create_playlist(playlist: Playlist):
     # Check if all track ids exist in tracks table
     for track_id in playlist.tracks:
-        result = execute_read_query(f"SELECT ID FROM tracks WHERE ID={track_id}")
+        result = execute_read_query(
+            f"SELECT ID FROM tracks WHERE ID={track_id}")
         if not result:
             raise HTTPException(
                 status_code=404, detail=f"Track with id {track_id} not found")
-    # Check if playlist already exists
-    result = execute_read_query(f"SELECT ID FROM playlists WHERE ID={playlist.id}")
-    if result:
-        raise HTTPException(status_code=409, detail="Playlist already exists")
+    # Check if playlist already exists by name - not needed
+    # result = execute_read_query(
+    #     f"SELECT ID FROM playlists WHERE PlaylistName='{playlist.name}'")
+    # if result:
+    #     raise HTTPException(status_code=409, detail="Playlist already exists")
     # Create the playlist in the playlists table
-    query = f"INSERT INTO playlists (ID, PlaylistName, Tracks) VALUES ({playlist.id}, '{playlist.name}', '{playlist.tracks}')"
+    track_ids = ",".join(map(str, playlist.tracks))
+    query = f"INSERT INTO playlists (PlaylistName, Tracks) VALUES ('{playlist.name}', '{track_ids}')"
     execute_query(query)
+    result = execute_read_query(
+        f"SELECT ID FROM playlists WHERE PlaylistName='{playlist.name}'")
+    playlist.id = result[0][0]
     return playlist
+
 
 
 # Read a specific playlist

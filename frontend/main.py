@@ -34,7 +34,9 @@ elif read_write == "Write":
     if write_type == "Track":
         # Add a section for adding new tracks
         st.header("Add a new track")
-        track_id = st.number_input("ID:")
+        # Removed id option - AUTO_INCREMENT in db
+        # track_id = st.number_input("ID:")
+        track_id = 0 #needed for the json obj, but it doesn't read it
         track_name = st.text_input("Name:")
         track_artist = st.text_input("Artist:")
         track_album = st.text_input("Album:")
@@ -52,6 +54,7 @@ elif read_write == "Write":
             response = requests.post(
                 "http://backend:8080/tracks", json=track_data)
             if response.status_code == 200:
+                st.write("Track data:", response.json())
                 st.success("Track added successfully!")
             else:
                 st.error("Error adding track.")
@@ -59,7 +62,7 @@ elif read_write == "Write":
     elif write_type == "Playlist":
         # Add a section for adding new playlists
         st.header("Add a new playlist")
-        playlist_id = st.number_input("ID:")
+        playlist_id = 0
         playlist_name = st.text_input("Name:")
         playlist_tracks = st.text_input("Tracks IDs(comma-separated):")
         if st.button("Add playlist"):
@@ -71,6 +74,7 @@ elif read_write == "Write":
             response = requests.post(
                 "http://backend:8080/playlists", json=playlist_data)
             if response.status_code == 200:
+                st.write("Playlist data:", response.json())
                 st.success("Playlist added successfully!")
             elif response.status_code == 404:
                 st.error("Error adding playlist. One or more track IDs may not exist.")
