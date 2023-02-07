@@ -48,7 +48,7 @@ def close_connection(conn):
 app = FastAPI()
 
 
-# Read a specific track - works
+# Read a specific track
 @app.get("/tracks/{track_id}")
 def read_track(track_id: int):
     query = f"SELECT * FROM tracks WHERE ID={track_id}"
@@ -63,7 +63,7 @@ def read_track(track_id: int):
         raise HTTPException(status_code=404, detail="Track not found")
 
 
-# Create a new track - works
+# Create a new track
 @app.post("/tracks")
 def create_track(track: Track):
     # Insert the new track into the tracks table
@@ -78,7 +78,7 @@ def create_track(track: Track):
     return track
 
 
-# Delete a specific track from db, also from all playlist - works
+# Delete a specific track from db, also from all playlist
 @app.delete("/tracks/{track_id}")
 def delete_track(track_id: int):
     # Check if the track is found in any of the playlists
@@ -97,7 +97,7 @@ def delete_track(track_id: int):
     return {"message": "Track deleted"}
 
 
-# Create a new playlist - works
+# Create a new playlist
 @app.post("/playlists")
 def create_playlist(playlist: Playlist):
     # Check if all track ids exist in tracks table
@@ -122,7 +122,7 @@ def create_playlist(playlist: Playlist):
     return playlist
 
 
-# Read a specific playlist - works
+# Read a specific playlist
 @app.get("/playlists/{playlist_id}")
 def read_playlist(playlist_id: int):
     # Fetch the playlist from the database
@@ -138,7 +138,7 @@ def read_playlist(playlist_id: int):
         raise HTTPException(status_code=404, detail="Playlist not found")
 
 
-# Delete a specific playlist  - works
+# Delete a specific playlist
 @app.delete("/playlists/{playlist_id}")
 def delete_playlist(playlist_id: int):
     # Delete the playlist
@@ -147,7 +147,7 @@ def delete_playlist(playlist_id: int):
     return {"message": "Playlist deleted"}
 
 
-# Remove a specific track from playlist - works
+# Remove a specific track from playlist
 @app.delete("/playlists/{playlist_id}/tracks/{track_id}")
 def remove_track_from_playlist(playlist_id: int, track_id: int):
     # Check if the playlist exists
@@ -167,6 +167,7 @@ def remove_track_from_playlist(playlist_id: int, track_id: int):
     execute_query(
         f"UPDATE playlists SET Tracks = '{playlist_tracks}' WHERE ID = {playlist_id}")
     return {"message": "Track removed from playlist"}
+
 
 # Add a new track to playlist
 @app.patch("/playlists/{playlist_id}/tracks/{track_id}")
@@ -197,6 +198,13 @@ def add_track_to_playlist(playlist_id: int, track_id: int):
     execute_query(
         f"UPDATE playlists SET Tracks = '{playlist_tracks}' WHERE ID = {playlist_id}")
     return {"message": "Track added to playlist"}
+
+
+
+
+
+
+
 # @app.patch("/playlists/tracks")
 # def add_track_to_playlist(payload: dict):
 #     playlist_id = payload.get("playlist_id")

@@ -1,44 +1,46 @@
-# Ex1_YanivLavi
+# MusicApp
 
-Ex1_YanivLavi is a demonstration of using FastAPI, Uvicorn, and Pydantic to build a web API.
+MusicApp is a platform designed to manage and organize a music collection. You can save information about audio tracks and create playlists. This is achieved through an API interface built using FastAPI, Uvicorn and Pydantic, which communicates with a database.
+The platform is divided into three components, each running in its own Docker container: database, frontend and backend. Each component runs in isolation. The database stores all the information, the frontend provides a user interface using streamlit library. The backend acts as a bridge, handling the communication between the two.
 
 ## Requirements
 
 To run this project, you will need the following software:
-
 - Docker
 - Python
+- Docker compose
 
 ## Libraries
 
-This project uses the following libraries:
+This project uses 3 microservices on separate containers with the following libraries:
 
+Backend:
 - FastAPI
 - Uvicorn
 - Pydantic
+
+Database:
+- Mysql 
+
+Frontend:
+- Stearmlit
+
 
 ## How to use
 
 1. Clone the repository:
 ```
-git clone https://github.com/EASS-HIT-PART-A-2022-CLASS-II/Ex1_YanivLavi.git
+git clone https://github.com/EASS-HIT-PART-A-2022-CLASS-II/MusicApp.git
 ```
 2. Navigate to the project directory:
 ```
-cd Ex1_YanivLavi
+cd MusicApp
 ```
-3. Build the Docker images:
+3. Run the docker compose command below:
 ```
-docker build -t backend backend/
-docker build -t frontend frontend/
+docker-compose up --build
 ```
-4. Run the Docker containers:
-```
-sudo docker network create MusicApp
-docker run -ti --name backend -p 8989:8080 --network MusicApp backend
-docker run -ti --name frontend -p 80:80 --network MusicApp frontend 
-```
-5. Go to http://localhost/
+4. Go to http://localhost/
 
 ## Additional Information
 
