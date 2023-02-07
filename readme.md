@@ -6,24 +6,27 @@ The platform is divided into three components, each running in its own Docker co
 ## Requirements
 
 To run this project, you will need the following software:
-- Docker
-- Python
 - Docker compose
 
 ## Libraries
 
-This project uses 3 microservices on separate containers with the following libraries:
+This project uses 3 microservices on separate containers:
 
-Backend:
+Backend is built using a python image and using the following libraries:
 - FastAPI
 - Uvicorn
 - Pydantic
+- mysql-connector-python
+- pytest
 
-Database:
-- Mysql 
-
-Frontend:
+Frontend is built using a python image and using the following libraries:
 - Stearmlit
+- requests
+
+Database is built using a mysql image and build the db from a predefined sql file:
+- db.sql
+
+
 
 
 ## How to Use MusicApp

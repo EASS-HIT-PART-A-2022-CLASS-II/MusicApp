@@ -80,7 +80,7 @@ elif read_write == "Write":
                 st.error("Error adding playlist. One or more track IDs may not exist.")
             elif response.status_code == 409:
                 st.error(
-                    "Playlist's ID already exists")
+                    "Playlist's Name already exists, please use another name.")
             else:
                 st.error("Error adding playlist.")
 

@@ -100,24 +100,29 @@ def delete_track(track_id: int):
 # Create a new playlist
 @app.post("/playlists")
 def create_playlist(playlist: Playlist):
-    # Check if all track ids exist in tracks table
-    for track_id in playlist.tracks:
-        result = execute_read_query(
-            f"SELECT ID FROM tracks WHERE ID={track_id}")
-        if not result:
-            raise HTTPException(
-                status_code=404, detail=f"Track with id {track_id} not found")
-    # Check if playlist already exists by name - not needed
-    # result = execute_read_query(
-    #     f"SELECT ID FROM playlists WHERE PlaylistName='{playlist.name}'")
-    # if result:
-    #     raise HTTPException(status_code=409, detail="Playlist already exists")
+    # Check if the playlist already exists
+    result = execute_read_query(
+        f"SELECT ID FROM playlists WHERE PlaylistName='{playlist.name}'")
+    if result:
+        raise HTTPException(
+            status_code=409, detail=f"Playlist with name '{playlist.name}' already exists")
+    
+    track_ids = ",".join(map(str, playlist.tracks)) if playlist.tracks else ""
+    # Check if all track ids exist in tracks table  
+    if playlist.tracks:
+        for track_id in playlist.tracks:
+            result = execute_read_query(
+                f"SELECT ID FROM tracks WHERE ID={track_id}")
+            if not result:
+                raise HTTPException(
+                    status_code=404, detail=f"Track with id {track_id} not found")
+        track_ids = ",".join(map(str, playlist.tracks))
+
     # Create the playlist in the playlists table
-    track_ids = ",".join(map(str, playlist.tracks))
     query = f"INSERT INTO playlists (PlaylistName, Tracks) VALUES ('{playlist.name}', '{track_ids}')"
     execute_query(query)
     result = execute_read_query(
-        f"SELECT ID FROM playlists WHERE PlaylistName='{playlist.name}'")
+        f"SELECT ID FROM playlists WHERE PlaylistName='{playlist.name}' AND Tracks='{track_ids}'")
     playlist.id = result[0][0]
     return playlist
 
