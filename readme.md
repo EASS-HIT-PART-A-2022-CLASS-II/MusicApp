@@ -3,10 +3,16 @@
 MusicApp is a platform designed to manage and organize a music collection. You can save information about audio tracks and create playlists. This is achieved through an API interface built using FastAPI, Uvicorn and Pydantic, which communicates with a database.
 The platform is divided into three components, each running in its own Docker container: database, frontend and backend. Each component runs in isolation. The database stores all the information, the frontend provides a user interface using streamlit library. The backend acts as a bridge, handling the communication between the two.
 
+Check out our project in action by clicking on this video link below:
+```
+https://youtu.be/7iZ8YZN-_U4
+```
+
 ## Requirements
 
 To run this project, you will need the following software:
-- Docker compose
+- Docker compose (https://docs.docker.com/compose/install/)
+
 
 ## Libraries
 
@@ -27,8 +33,6 @@ Database is built using a mysql image and build the db from a predefined sql fil
 - db.sql
 
 
-
-
 ## How to Use MusicApp
 Follow these steps to get MusicApp up and running on your local machine:
 
@@ -44,12 +48,19 @@ cd MusicApp
 ```
 docker-compose up --build
 ```
-4. Once the services are up and running, access MusicApp at http://localhost/ in your web browser.
-
-5. To stop the services, run the following command:
+4. Once the services are up and running, access MusicApp in your web browser:
+```
+http://localhost/
+```
+5. Docs is also available on the endpoint server:
+```
+http://localhost:8080/docs
+```
+6. To stop the services, run the following command:
 ```
 docker-compose down
 ```
+
 
 ## Additional Information
 

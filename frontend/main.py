@@ -92,15 +92,6 @@ elif read_write == "Write":
         if st.button("Add track to playlist"):
             response = requests.patch(
                 f"http://backend:8080/playlists/{playlist_id}/tracks/{track_id}")
-        
-            # response = requests.patch(
-            #     f"http://backend:8080/playlists/{playlist_id}/tracks", json={"track_id": track_id})
-            # response = requests.patch(
-            #     f"http://backend:8080/playlists/{playlist_id}/tracks", json={"playlist_id": playlist_id, "track_id": track_id})
-            # response = requests.patch(
-            #     "http://backend:8080/playlists/tracks",
-            #     json={"playlist_id": playlist_id, "track_id": track_id}
-            # )
             if response.status_code == 200:
                 st.success("Track added to playlist successfully!")
             elif response.status_code == 404:
