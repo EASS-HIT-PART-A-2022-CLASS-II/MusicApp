@@ -4,9 +4,8 @@ MusicApp is a platform designed to manage and organize a music collection. You c
 The platform is divided into three components, each running in its own Docker container: database, frontend and backend. Each component runs in isolation. The database stores all the information, the frontend provides a user interface using streamlit library. The backend acts as a bridge, handling the communication between the two.
 
 Check out the project on this video:
-```
 https://youtu.be/7iZ8YZN-_U4
-```
+
 
 ## Requirements
 
