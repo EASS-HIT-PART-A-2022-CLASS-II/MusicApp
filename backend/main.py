@@ -47,7 +47,8 @@ def close_connection(conn):
 
 app = FastAPI()
 
-# Read a specific track
+
+# Read a specific track - works
 @app.get("/tracks/{track_id}")
 def read_track(track_id: int):
     query = f"SELECT * FROM tracks WHERE ID={track_id}"
@@ -61,7 +62,8 @@ def read_track(track_id: int):
     else:
         raise HTTPException(status_code=404, detail="Track not found")
 
-# Create a new track
+
+# Create a new track - works
 @app.post("/tracks")
 def create_track(track: Track):
     # Insert the new track into the tracks table
@@ -76,22 +78,26 @@ def create_track(track: Track):
     return track
 
 
-# Delete a specific track
+# Delete a specific track from db, also from all playlist - works
 @app.delete("/tracks/{track_id}")
 def delete_track(track_id: int):
     # Check if the track is found in any of the playlists
     playlists = execute_read_query(
-        f"SELECT ID FROM playlists WHERE Tracks LIKE '%{track_id}%'")
+        f"SELECT ID, Tracks FROM playlists WHERE Tracks LIKE '%{track_id}%'")
     # Delete the track from all playlists that contain it
     for playlist in playlists:
+        playlist_id = int(playlist[0])
+        playlist_tracks = playlist[1].split(",")
+        playlist_tracks.remove(str(track_id))
+        playlist_tracks = ",".join(playlist_tracks)
         execute_query(
-            f"UPDATE playlists SET Tracks = replace(Tracks, '{track_id}', '') WHERE ID = {playlist['ID']}")
+            f"UPDATE playlists SET Tracks = '{playlist_tracks}' WHERE ID = {playlist_id}")
     # Delete the track itself
     execute_query(f"DELETE FROM tracks WHERE ID = {track_id}")
     return {"message": "Track deleted"}
 
 
-# Create a new playlist
+# Create a new playlist - works
 @app.post("/playlists")
 def create_playlist(playlist: Playlist):
     # Check if all track ids exist in tracks table
@@ -116,21 +122,23 @@ def create_playlist(playlist: Playlist):
     return playlist
 
 
-
-# Read a specific playlist
+# Read a specific playlist - works
 @app.get("/playlists/{playlist_id}")
 def read_playlist(playlist_id: int):
     # Fetch the playlist from the database
     query = f"SELECT * FROM playlists WHERE ID={playlist_id}"
     result = execute_read_query(query)
     if result:
+        playlist_data = result[0]
+        tracks = playlist_data[2].split(",") if playlist_data[2] else []
+        playlist = Playlist(id=playlist_data[0], name=playlist_data[1], tracks=tracks)
         # Return the playlist as a Playlist object
-        return Playlist(**result[0])
+        return playlist
     else:
         raise HTTPException(status_code=404, detail="Playlist not found")
 
 
-# Delete a specific playlist
+# Delete a specific playlist  - works
 @app.delete("/playlists/{playlist_id}")
 def delete_playlist(playlist_id: int):
     # Delete the playlist
@@ -139,40 +147,99 @@ def delete_playlist(playlist_id: int):
     return {"message": "Playlist deleted"}
 
 
-# Remove a specific track from playlist
+# Remove a specific track from playlist - works
 @app.delete("/playlists/{playlist_id}/tracks/{track_id}")
 def remove_track_from_playlist(playlist_id: int, track_id: int):
+    # Check if the playlist exists
+    playlist_data = execute_read_query(
+        f"SELECT Tracks FROM playlists WHERE ID={playlist_id}")
+    if not playlist_data:
+        raise HTTPException(
+            status_code=404, detail="Playlist not found")
     # Check if the track is in the playlist
-    query = f"SELECT * FROM playlists WHERE ID={playlist_id} AND Tracks LIKE '%,{track_id},%' OR Tracks LIKE '{track_id},%' OR Tracks LIKE '%,{track_id}'"
-    result = execute_read_query(query)
-    if not result:
+    playlist_tracks = playlist_data[0][0].split(",")
+    if str(track_id) not in playlist_tracks:
         raise HTTPException(
             status_code=404, detail="Track not found in playlist")
+    # Remove the track from the playlist
+    playlist_tracks.remove(str(track_id))
+    playlist_tracks = ",".join(playlist_tracks)
     execute_query(
-        f"UPDATE playlists SET Tracks = REPLACE(tracks, ',{track_id}', '') WHERE ID = {playlist_id}")
+        f"UPDATE playlists SET Tracks = '{playlist_tracks}' WHERE ID = {playlist_id}")
     return {"message": "Track removed from playlist"}
 
-
 # Add a new track to playlist
-@app.post("/playlists/{playlist_id}/tracks/{track_id}")
+@app.patch("/playlists/{playlist_id}/tracks/{track_id}")
 def add_track_to_playlist(playlist_id: int, track_id: int):
     # Check if the playlist exists
-    query = f"SELECT * FROM playlists WHERE ID={playlist_id}"
-    result = execute_read_query(query, conn)
-    if not result:
-        raise HTTPException(status_code=404, detail="Playlist not found")
-    # Check if the track exists
-    query = f"SELECT * FROM Tracks WHERE ID={track_id}"
-    result = execute_read_query(query)
-    if not result:
-        raise HTTPException(status_code=404, detail="Track not found")
-    # Check if the track is already in the playlist
-    query = f"SELECT * FROM playlists WHERE ID={playlist_id} AND Tracks LIKE '%{track_id}%'"
-    result = execute_read_query(query)
-    if result:
+    playlist_data = execute_read_query(
+        f"SELECT Tracks FROM playlists WHERE ID={playlist_id}")
+    if not playlist_data:
         raise HTTPException(
-            status_code=409, detail="Track already in playlist")
-    # Add the track to the playlist
-    query = f"UPDATE playlists SET Tracks=CONCAT(Tracks, ',{track_id}') WHERE ID={playlist_id}"
-    execute_query(query)
+            status_code=404, detail="Playlist not found")
+    # Check if the playlist is empty
+    playlist_tracks = playlist_data[0][0].split(",")
+    if not playlist_tracks[0]:
+        playlist_tracks = str(track_id)
+    else:
+        # Check if the track is already in the playlist
+        if str(track_id) in playlist_tracks:
+            raise HTTPException(
+                status_code=400, detail="Track already in playlist")
+        # Add the track to the playlist
+        playlist_tracks.append(str(track_id))
+        playlist_tracks = ",".join(playlist_tracks)
+    execute_query(
+        f"UPDATE playlists SET Tracks = '{playlist_tracks}' WHERE ID = {playlist_id}")
     return {"message": "Track added to playlist"}
+# @app.patch("/playlists/tracks")
+# def add_track_to_playlist(payload: dict):
+#     playlist_id = payload.get("playlist_id")
+#     track_id = payload.get("track_id")
+
+#     # Check if the playlist exists
+#     playlist_data = execute_read_query(
+#         f"SELECT Tracks FROM playlists WHERE ID={playlist_id}"
+#     )
+#     if not playlist_data:
+#         raise HTTPException(status_code=404, detail="Playlist not found")
+
+#     # Check if the playlist is empty
+#     playlist_tracks = playlist_data[0][0].split(",")
+#     if not playlist_tracks[0]:
+#         playlist_tracks = str(track_id)
+#     else:
+#         # Check if the track is already in the playlist
+#         if str(track_id) in playlist_tracks:
+#             raise HTTPException(
+#                 status_code=400, detail="Track already in playlist"
+#             )
+#         # Add the track to the playlist
+#         playlist_tracks.append(str(track_id))
+#         playlist_tracks = ",".join(playlist_tracks)
+
+#     execute_query(
+#         f"UPDATE playlists SET Tracks = '{playlist_tracks}' WHERE ID = {playlist_id}"
+#     )
+#     return {"message": "Track added to playlist"}
+
+# def add_track_to_playlist(playlist_id: int, track_id: int):
+#     # Check if the playlist exists
+#     playlist_data = execute_read_query(
+#         f"SELECT Tracks FROM playlists WHERE ID={playlist_id}")
+#     if not playlist_data:
+#         raise HTTPException(
+#             status_code=404, detail="Playlist not found")
+#     # Check if the playlist is empty
+#     playlist_tracks = playlist_data[0][0].split(",") 
+#     # Check if the track is already in the playlist
+#     if str(track_id) in playlist_tracks:
+#         raise HTTPException(
+#             status_code=400, detail="Track already in playlist")
+#     # Add the track to the playlist
+#     playlist_tracks.append(str(track_id))
+#     playlist_tracks = ",".join(playlist_tracks)
+#     execute_query(
+#         f"UPDATE playlists SET Tracks = '{playlist_tracks}' WHERE ID = {playlist_id}")
+#     return {"message": "Track added to playlist"}
+

@@ -21,7 +21,7 @@ VALUES ("Track 1", "Artist 1", "Album 1", "Genre 1", 120),
 CREATE TABLE playlists (
     ID int NOT NULL AUTO_INCREMENT,
     PlaylistName varchar(100) NOT NULL,
-    Tracks varchar(255) NOT NULL,
+    Tracks varchar(255) , 
     PRIMARY KEY (id)
 );
 

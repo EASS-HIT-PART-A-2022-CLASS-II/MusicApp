@@ -87,22 +87,32 @@ elif read_write == "Write":
     elif write_type == "Track to Playlist":
         # Add a section for adding new track to a playlist
         st.header("Add a track to playlist")
-        playlist_id = st.number_input("Playlist ID:")
-        track_id = st.number_input("Track ID:")
+        playlist_id = int(st.number_input("Playlist ID:"))
+        track_id = int(st.number_input("Track ID:"))
         if st.button("Add track to playlist"):
             response = requests.patch(
                 f"http://backend:8080/playlists/{playlist_id}/tracks/{track_id}")
+        
+            # response = requests.patch(
+            #     f"http://backend:8080/playlists/{playlist_id}/tracks", json={"track_id": track_id})
+            # response = requests.patch(
+            #     f"http://backend:8080/playlists/{playlist_id}/tracks", json={"playlist_id": playlist_id, "track_id": track_id})
+            # response = requests.patch(
+            #     "http://backend:8080/playlists/tracks",
+            #     json={"playlist_id": playlist_id, "track_id": track_id}
+            # )
             if response.status_code == 200:
                 st.success("Track added to playlist successfully!")
             elif response.status_code == 404:
                 st.error(
-                    "Error adding track to playlist. Playlist or Track may not exist.")
+                    "Error adding track to playlist. Playlist not exist.")
+            elif response.status_code == 400:
+                st.error(
+                    "Error adding track to playlist. Track already in playlist.")
             else:
                 st.error("Error adding track to playlist.")
 
-
-        
-            
+   
 elif read_write == "Remove":
     # Remove data section
     remove_type = st.radio("Remove track, playlist or a track from a playlist?",
