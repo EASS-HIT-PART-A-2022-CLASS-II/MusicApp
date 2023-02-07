@@ -177,6 +177,11 @@ def add_track_to_playlist(playlist_id: int, track_id: int):
     if not playlist_data:
         raise HTTPException(
             status_code=404, detail="Playlist not found")
+    track_data = execute_read_query(
+        f"SELECT * FROM tracks WHERE ID={track_id}")
+    if not track_data:
+        raise HTTPException(
+            status_code=407, detail="Track not found")
     # Check if the playlist is empty
     playlist_tracks = playlist_data[0][0].split(",")
     if not playlist_tracks[0]:

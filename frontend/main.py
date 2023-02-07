@@ -106,6 +106,9 @@ elif read_write == "Write":
             elif response.status_code == 404:
                 st.error(
                     "Error adding track to playlist. Playlist not exist.")
+            elif response.status_code == 407:
+                st.error(
+                    "Error adding track to playlist. Track not exist.")
             elif response.status_code == 400:
                 st.error(
                     "Error adding track to playlist. Track already in playlist.")
