@@ -26,21 +26,27 @@ Frontend:
 - Stearmlit
 
 
-## How to use
+## How to Use MusicApp
+Follow these steps to get MusicApp up and running on your local machine:
 
 1. Clone the repository:
 ```
 git clone https://github.com/EASS-HIT-PART-A-2022-CLASS-II/MusicApp.git
 ```
-2. Navigate to the project directory:
+2. Change into the project directory:
 ```
 cd MusicApp
 ```
-3. Run the docker compose command below:
+3. Use the following command to run MusicApp using Docker Compose:
 ```
 docker-compose up --build
 ```
-4. Go to http://localhost/
+4. Once the services are up and running, access MusicApp at http://localhost/ in your web browser.
+
+5. To stop the services, run the following command:
+```
+docker-compose down
+```
 
 ## Additional Information
 
