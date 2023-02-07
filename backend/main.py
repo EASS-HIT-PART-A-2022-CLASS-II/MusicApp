@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from models import Track, Playlist
 import mysql.connector
-# import sqlite3
 
 def create_connection():
     try:
