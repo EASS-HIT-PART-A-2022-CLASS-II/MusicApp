@@ -3,7 +3,7 @@
 MusicApp is a platform designed to manage and organize a music collection. You can save information about audio tracks and create playlists. This is achieved through an API interface built using FastAPI, Uvicorn and Pydantic, which communicates with a database.
 The platform is divided into three components, each running in its own Docker container: database, frontend and backend. Each component runs in isolation. The database stores all the information, the frontend provides a user interface using streamlit library. The backend acts as a bridge, handling the communication between the two.
 
-Check out our project in action by clicking on this video link below:
+Check out the project on this video:
 ```
 https://youtu.be/7iZ8YZN-_U4
 ```
