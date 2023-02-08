@@ -8,4 +8,4 @@ COPY . .
 EXPOSE 80
 
 # CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
-ENTRYPOINT ["streamlit", "run", "main.py", "--server.port=80", "--server.address=0.0.0.0"]
+# ENTRYPOINT ["streamlit", "run", "main.py", "--server.port=80", "--server.address=0.0.0.0"]
