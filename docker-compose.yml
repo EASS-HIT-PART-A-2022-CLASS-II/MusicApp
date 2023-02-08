@@ -34,7 +34,15 @@ services:
       MYSQL_ROOT_PASSWORD: 'root'
     # volumes:
     #   - db:/docker-entrypoint-initdb.d/
+    networks:
+      - MusicApp
 
+  tests:
+    build:
+      context: ./tests
+    command: sh -c "sleep 10; pytest"
+    depends_on:
+      - frontend
     networks:
       - MusicApp
 
