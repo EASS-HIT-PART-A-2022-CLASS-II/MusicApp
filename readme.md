@@ -43,7 +43,7 @@ git clone https://github.com/EASS-HIT-PART-A-2022-CLASS-II/MusicApp.git
 ```
 cd MusicApp
 ```
-3. Use the following command to run MusicApp using Docker Compose:
+3. Use the following command to run MusicApp using Docker Compose and wait until you see that the integration_test.py passed (delayed 20 sec):
 ```
 docker-compose up --build
 ```
